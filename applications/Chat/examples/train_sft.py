@@ -1,9 +1,13 @@
 import argparse
 import os
-
+import sys
 import loralib as lora
 import torch
 import torch.distributed as dist
+
+coati_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(coati_dir)
+
 from coati.dataset import DataCollatorForSupervisedDataset, SFTDataset, SupervisedDataset
 from coati.models.base import RewardModel
 from coati.models.bloom import BLOOMLM
