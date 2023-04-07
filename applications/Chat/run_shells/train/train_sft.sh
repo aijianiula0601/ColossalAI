@@ -12,7 +12,8 @@ cd "$curdir" || exit
 # conda activate colossalai
 # transformer安装(报错：cannot import name 'LlamaConfig' from 'transformers')：
 #   pip install git+https://github.com/huggingface/transformers
-#
+# 问题：
+#   v100 32G 显存，batch_size=2都无法训练起来，而且它不支持deepspeech优化
 #--------------------------------------------------------------------
 
 cd ../../../../
