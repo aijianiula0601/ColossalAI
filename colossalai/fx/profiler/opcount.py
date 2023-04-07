@@ -223,8 +223,7 @@ def zero_flop_jit(*args):
     return 0
 
 
-if version.parse(torch.__version__) >= version.parse('1.12.0') and version.parse(
-        torch.__version__) < version.parse('2.0.0'):
+if version.parse(torch.__version__) >= version.parse('1.12.0'):
     flop_mapping = {
     # gemm, gemv and dot
         aten.mm.default: matmul_flop_jit,

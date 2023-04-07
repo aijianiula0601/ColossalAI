@@ -1,7 +1,6 @@
-import functools
 from typing import Callable, List
-
 import torch
+import functools
 
 
 class BaseParamHookMgr(object):

@@ -1,13 +1,12 @@
-import pytest
 import torch
 import torch.nn as nn
 
-from colossalai._analyzer.fx.graph_module import ColoGraphModule
-from colossalai._analyzer.fx.passes.shape_prop import shape_prop_pass
-from colossalai._analyzer.fx.tracer.tracer import ColoTracer
-from colossalai.auto_parallel.tensor_shard.node_handler.where_handler import WhereHandler
-from colossalai.auto_parallel.tensor_shard.sharding_strategy import OperationData, OperationDataType, StrategiesVector
+from colossalai.auto_parallel.tensor_shard.node_handler.where_handler import \
+    WhereHandler
+from colossalai.auto_parallel.tensor_shard.sharding_strategy import (OperationData, OperationDataType, StrategiesVector)
 from colossalai.device.device_mesh import DeviceMesh
+from colossalai.fx import ColoGraphModule, ColoTracer
+from colossalai.fx.tracer.meta_patch.patched_module import linear
 
 
 class ConvModel(nn.Module):
@@ -20,24 +19,22 @@ class ConvModel(nn.Module):
         return output
 
 
-@pytest.mark.skip('ShapeProp is not compatible with PyTorch 1.11.0')
 def test_where_handler():
     model = ConvModel()
-    tracer = ColoTracer(bias_addition_split=True)
+    tracer = ColoTracer()
     # graph():
     #     %condition : torch.Tensor [#users=1] = placeholder[target=condition]
     #     %x : torch.Tensor [#users=1] = placeholder[target=x]
     #     %y : torch.Tensor [#users=1] = placeholder[target=y]
     #     %where : [#users=1] = call_function[target=torch.where](args = (%condition, %x, %y), kwargs = {})
     #     return where
-    meta_args = {
-        'condition': torch.rand(4, 4, 64, 64).to('meta'),
-        'x': torch.rand(4, 1, 64, 64).to('meta'),
-        'y': torch.rand(1, 4, 64, 64).to('meta')
-    }
-    graph = tracer.trace(model, meta_args=meta_args)
+    graph = tracer.trace(model,
+                         meta_args={
+                             "condition": torch.rand(4, 4, 64, 64).to('meta'),
+                             "x": torch.rand(4, 1, 64, 64).to('meta'),
+                             "y": torch.rand(1, 4, 64, 64).to('meta')
+                         })
     gm = ColoGraphModule(model, graph)
-    shape_prop_pass(gm, *meta_args.values())
     physical_mesh_id = torch.arange(0, 4)
 
     mesh_shape = (2, 2)

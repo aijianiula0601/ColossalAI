@@ -1,8 +1,6 @@
-from typing import Any, List, Union
-
+from typing import List, Union, Any
+from ..proxy import ColoProxy, ColoAttribute
 import torch
-
-from ..proxy import ColoAttribute, ColoProxy
 from .meta_patch import meta_patched_function, meta_patched_module
 
 __all__ = ['is_element_in_list', 'extract_meta']

@@ -1,11 +1,12 @@
-from typing import List, Optional, Union
-
+import torch
+from typing import Union, Optional, List
+from colossalai.tensor import ColoTensor
 import torch
 import torch.distributed as dist
-
 from colossalai.global_variables import tensor_parallel_env as env
+
 from colossalai.nn.layer.utils import divide
-from colossalai.tensor import ColoTensor, ColoTensorSpec, ProcessGroup
+from colossalai.tensor import ProcessGroup, ColoTensorSpec
 
 GeneralTensor = Union[ColoTensor, torch.Tensor]
 Number = Union[int, float]
@@ -134,7 +135,7 @@ class _ReduceInput(torch.autograd.Function):
 class _SplitForwardGatherBackward(torch.autograd.Function):
     """
     Split the input and keep only the corresponding chuck to the rank.
-
+    
     Args:
         input_: input matrix.
         process_group: parallel mode.
